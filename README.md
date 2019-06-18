@@ -325,6 +325,7 @@ plotNumberSignatures(gof_nmf)
 dev.off()
 
 ```
+[plotNumberOfSignatures](figures/plotNumberOfSignatures.pdf)
 
 Open up the PDF and examine the curve.
 
@@ -360,6 +361,8 @@ dev.off()
 
 Open up the `plot3Signatures_heatmat.pdf` that will have been made.
 
+[plot3Signatures_heatmat](figures/plot3Signatures_heatmat.pdf)
+
 **Are the coresponding cluster fiting with what we predict based on the number of mutation ?** [solution](solutions/_vcf5.md)
 
 Now we can plot out the results for the individual samples in our dataset to show what
@@ -371,6 +374,8 @@ plotSamples(sigs_nmf, normalize=TRUE) + scale_y_continuous(breaks=seq(0, 1, 0.2)
 dev.off()
 
 ```
+
+[PlotSampleContribution3Signatures](figures/PlotSampleContribution3Signatures.pdf)
 
 Open the resulting `PlotSampleContribution3Signatures.pdf`. This shows the results for the mutation grouping for each sample. The samples are listed on the x-axis and the proportion of all mutations for that sample is shown on the y-axis. The colours of the bars indicate what proportion of the mutations for that sample were grouped into each of the signatures. The colour that makes up most of the bar for each sample is called its ”major signature”.
 
