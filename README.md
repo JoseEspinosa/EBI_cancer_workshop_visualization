@@ -355,6 +355,9 @@ pheatmap(samples(sigs_nmf),cluster_cols=F, clustering_distance_cols = "correlati
 dev.off()
 
 ```
+
+*Note: 2 and 5 signature 1*
+
 Open up the `plot3Signatures_heatmat.pdf` that will have been made.
 
 **Are the coresponding cluster fiting with what we predict based on the number of mutation ?** [solution](solutions/_vcf5.md)
@@ -386,6 +389,17 @@ dev.off()
 
 Open up the `plot3Signatures.pdf` that will have been made.
 
+[plot3Signatures](figures/plot3Signatures.pdf)
+
+*Note: Which signature correspond to alexadrov? s1 seems to be 1A or 1B*
+
+*The signature S1 looks like either signature 1A or 1B from Alexandrov*
+
+*The signature S2 may be the signature 1B or 6 from Alexandrov*
+
+*The signature S3 may be the signature 3, 5, 8, 9 or 16 from Alexandrov*
+
+*To find the exact signature is very difficult.*
 
 The 96 possible mutation/context combinations are plotted along the x axis arranged in blocks of 6 lots of 16 (see information above). The height of the bars indicates the frequency of those particular mutation and context combinations in each signature.
 
@@ -413,6 +427,7 @@ library(deconstructSigs)
 
 First we need to reformat the data to  fit the `deconstructSigs` input format
 
+*Row samples*
 
 ```{.R}
 sigs.input=as.data.frame(t(mm))
@@ -436,6 +451,8 @@ colnames(sigs.input)=c("A[C>A]A","A[C>A]C","A[C>A]G","A[C>A]T","C[C>A]A","C[C>A]
 
 We can now plot for each sample the contribution of known mutations
 ```{.R}
+# For each sample match with alexandrov
+
 pdf("results/PlotSampleDeconstructAlexandrov_pie.pdf")
 layout(matrix(1:6,ncol=2,byrow=T))
 for (i in rownames(sigs.input)) {
@@ -445,6 +462,18 @@ for (i in rownames(sigs.input)) {
 dev.off()
 
 ```
+*Note
+*3,4,5 have a strong partipation of signature 3
+*4 and 6 strong 5
+*signature 2 qand 5 a lot of unknown, s1 in the heatmap a mixtuer.
+
+*1 then go with 2 and 5--> age and mmr deficiency colorecatal cancer 
+*s03, S04 and S04 
+
+
+[PlotSampleDeconstructAlexandrov_pie](figures/PlotSampleDeconstructAlexandrov_pie.pdf)
+
+*Note: with more samples and machine learning approaches is better*
 
 exit R
 
