@@ -30,6 +30,8 @@ After completing this practical the trainee should be able to:
 -----------------------------
 # Somatic mutational signature analysis 
 
+*Some people also use mutational signture to cluster samples*
+
 ## Introduction
 The most common genetic model for cancer development is the accumulation of DNA mutations over time, eventually leading to the disruption or dysregulation of enough key genes that lead cells to uncontrolled growth. Cells in our bodies accumulate DNA mutations over time due to normal aging processes, through exposure to carcinogens or through defects in the cell’s ability to repair mistakes.  
 
@@ -93,6 +95,7 @@ ls vcf/
 > ├── S05.mutect.somatic.vcf   
 > ├── S06.mutect.somatic.vcf   
 
+*This is vcf are from mutect, we want to see if we can cluster the samples to which cancer the belong*
 
 we could explore one vcf file
 
@@ -158,7 +161,23 @@ together and look at what is contained in the concatenated vranges data
 vranges.cat <- do.call(c,vranges)
 vranges.cat
 
+# note the samples is encode in a column!!!
+            totalDepth       refDepth       altDepth   sampleNames
+         <integerOrRle> <integerOrRle> <integerOrRle> <factorOrRle>
+     [1]             31             28              3           S01
+     [2]             26             22              4           S01
+     [3]             20             17              3           S01
+     [4]              2              0              2           S01
+     [5]              3              1              2           S01
+     ...            ...            ...            ...           ...
+  [4645]              6              3              3           S06
+  [4646]              7              4              3           S06
+  [4647]             11              8              3           S06
+  [4648]             35             29              5           S06
+  [4649]              5              2              3           S06
+
 ```
+
 The first line of output of the vranges.cat shows us that in total we have put over 4,000 mutations. 
 For each mutation we record between others:
  - the chromosome position
@@ -180,6 +199,12 @@ print(table(sampleNames(vranges.cat)))
 
 
 **Could you predict which sample belongs to kidney or renal cancers ?** [solution](solutions/_vcf3.md)
+
+*Note: we can try to cluster based and the number of somatic mutation as, it is well accepted that different cancer could lead to different level of mutation burden.
+In that case S01, S04 and S05 would be clustered togther with low burden and S02, S03, S06 would be clustered as high burden.
+We would see later if this early prediction is accurate. *
+
+**Note: We should use mutational signatures!!!**
 
 now we can use the reference and the position of the mutation to look up the bases on either side of the mutation i.e. the mutation context.
 
@@ -206,10 +231,27 @@ mc
 
 Note that the mutation and its context have been added to the last two columns
 
+```bash
+               SS     alteration        context
+         <integer> <DNAStringSet> <DNAStringSet>
+     [1]         2             CT            A.T
+     [2]         2             TC            G.C
+     [3]         2             CT            C.C
+     [4]         2             CG            G.C
+     [5]         2             CT            C.G
+     ...       ...            ...            ...
+  [4645]         2             CT            A.A
+  [4646]         2             TA            A.G
+  [4647]         2             TG            T.A
+  [4648]         2             CA            C.C
+  [4649]         2             TC            T.G
+```
 
 There are a total of 96 possible single base mutations and context combinations. We can calculate this by, first, listing out the six possible types of single nucleotide mutations: 
 
- - C/A the reverse compliment (G/T) is also in this group
+*Note: 6 type of mutation. If you are C/A you already you have in the reverse complement G/T*
+
+- C/A the reverse compliment (G/T) is also in this group
  - C/G includes (G/C)
  - C/T includes (G/C)
  - T/A includes (A/T)
@@ -231,12 +273,26 @@ Now if we substitute the [.]’s with each of the 6 different mutations you will
 
 **What about a mutation that looks like G[A/C]A, where should this go ?** [solution](solutions/_vcf4.md)
 
- 
+ *Note: A/C -> T/G is not part of the list we have to reverse, we also have to reverse complement the context. G[.]A -> T[.]C *
+
 Now we have all the information that is needed for each sample we can make a matrix that contains counts of mutations in each of the 96 possible combinations of mutations and contexts counting up the totals separately for each sample 
 
 ```{.R}
 mm <- motifMatrix(mc, group = "sampleNames", normalize=TRUE)
 dim(mm)
+
+mm
+
+mm
+               S01         S02         S03         S04         S05         S06
+CA A.A 0.027829314 0.035409035 0.013029316 0.018915511 0.019672131 0.020682523
+CA A.C 0.012987013 0.012210012 0.011943540 0.013871375 0.013114754 0.009307135
+CA A.G 0.001855288 0.001221001 0.008686211 0.010088272 0.004918033 0.004136505
+CA A.T 0.003710575 0.006105006 0.008686211 0.008827238 0.003278689 0.008273009
+CA C.A 0.009276438 0.018315018 0.013029316 0.012610340 0.013114754 0.012409514
+CA C.C 0.009276438 0.007326007 0.013029316 0.012610340 0.016393443 0.016546019
+...
+TG T.T 0.014842301 0.009768010 0.013029316 0.010088272 0.011475410 0.015511892
 
 ```
 
@@ -247,6 +303,8 @@ values) and 6 columns which are the 6 samples.
 
 ## Running the NMF analysis
 
+*Note: how many number of signature we need to include to get the maximun part of the variance* 
+
 Using the matrix we have made we can now run the non-negative matrix factorisation (NMF) process that attempts to find the most stable, grouping solutions for all of the combinations of mutations and contexts. It does this by trying to find similar patterns, or profiles, amongst the samples to sort the data into firstly just 2 groups. This is repeated to get replicate values for each attempt and then separating the data by 3 groups, and then 4 and so on.
 
 
@@ -254,6 +312,8 @@ Using the matrix we have made we can now run the non-negative matrix factorisati
 gof_nmf <- assessNumberSignatures(mm, 2:6, nReplicates = 5)
 
 ```
+*Note: how many number of signature we need to include to get the maximun part of the variance. We could use 3, 4 or 5. Take into account for the model in the nmf. I use 3 like in the tutorial!*
+
 
 These parameter choices have been made to keep the running time short for this practical !
 
