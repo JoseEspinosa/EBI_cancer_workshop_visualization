@@ -323,9 +323,12 @@ Visualise the results from the NMF processing by making a pdf of the plot
 pdf("results/plotNumberOfSignatures.pdf")
 plotNumberSignatures(gof_nmf)
 dev.off()
-
+png("results/plotNumberOfSignatures.png")
+plotNumberSignatures(gof_nmf)
+dev.off()
 ```
 [plotNumberOfSignatures](figures/plotNumberOfSignatures.pdf)
+[plotNumberOfSignatures](figures/plotNumberOfSignatures.png)
 
 Open up the PDF and examine the curve.
 
@@ -354,6 +357,9 @@ library(pheatmap)
 pdf("results/plot3Signatures_heatmat.pdf")
 pheatmap(samples(sigs_nmf),cluster_cols=F, clustering_distance_cols = "correlation")
 dev.off()
+png("results/plot3Signatures_heatmat.png")
+pheatmap(samples(sigs_nmf),cluster_cols=F, clustering_distance_cols = "correlation")
+dev.off()
 
 ```
 
@@ -362,6 +368,8 @@ dev.off()
 Open up the `plot3Signatures_heatmat.pdf` that will have been made.
 
 [plot3Signatures_heatmat](figures/plot3Signatures_heatmat.pdf)
+
+[plot3Signatures_heatmat](figures/plot3Signatures_heatmat.png)
 
 **Are the coresponding cluster fiting with what we predict based on the number of mutation ?** [solution](solutions/_vcf5.md)
 
@@ -372,10 +380,14 @@ proportion of their mutations have been assigned to each of the signatures.
 pdf("results/PlotSampleContribution3Signatures.pdf")
 plotSamples(sigs_nmf, normalize=TRUE) + scale_y_continuous(breaks=seq(0, 1, 0.2), expand = c(0,0))+ theme(axis.text.x = element_text(size=6))
 dev.off()
-
+png("results/PlotSampleContribution3Signatures.png")
+plotSamples(sigs_nmf, normalize=TRUE) + scale_y_continuous(breaks=seq(0, 1, 0.2), expand = c(0,0))+ theme(axis.text.x = element_text(size=6))
+dev.off()
 ```
 
 [PlotSampleContribution3Signatures](figures/PlotSampleContribution3Signatures.pdf)
+
+[PlotSampleContribution3Signatures](figures/PlotSampleContribution3Signatures.png)
 
 Open the resulting `PlotSampleContribution3Signatures.pdf`. This shows the results for the mutation grouping for each sample. The samples are listed on the x-axis and the proportion of all mutations for that sample is shown on the y-axis. The colours of the bars indicate what proportion of the mutations for that sample were grouped into each of the signatures. The colour that makes up most of the bar for each sample is called its ”major signature”.
 
@@ -390,11 +402,15 @@ pdf("results/plot3Signatures.pdf")
 plotSignatures(sigs_nmf,normalize=TRUE, percent=FALSE) + ggtitle("Somatic Signatures: NMF - Barchart") + scale_fill_brewer(palette = "Set2")
 dev.off()
 
+png("results/plot3Signatures.png")
+plotSignatures(sigs_nmf,normalize=TRUE, percent=FALSE) + ggtitle("Somatic Signatures: NMF - Barchart") + scale_fill_brewer(palette = "Set2")
+dev.off()
 ```
 
 Open up the `plot3Signatures.pdf` that will have been made.
 
 [plot3Signatures](figures/plot3Signatures.pdf)
+
 
 *Note: Which signature correspond to alexadrov? s1 seems to be 1A or 1B*
 
@@ -466,6 +482,14 @@ for (i in rownames(sigs.input)) {
 }
 dev.off()
 
+png("results/PlotSampleDeconstructAlexandrov_pie.png")
+layout(matrix(1:6,ncol=2,byrow=T))
+for (i in rownames(sigs.input)) {
+	output.sigs = whichSignatures(tumor.ref = sigs.input, signatures.ref = signatures.nature2013, sample.id = i)
+	makePie(output.sigs)
+}
+dev.off()
+
 ```
 *Note
 *3,4,5 have a strong partipation of signature 3
@@ -477,6 +501,8 @@ dev.off()
 
 
 [PlotSampleDeconstructAlexandrov_pie](figures/PlotSampleDeconstructAlexandrov_pie.pdf)
+
+[PlotSampleDeconstructAlexandrov_pie](figures/PlotSampleDeconstructAlexandrov_pie.png)
 
 *Note: with more samples and machine learning approaches is better*
 
