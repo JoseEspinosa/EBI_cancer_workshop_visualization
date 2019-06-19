@@ -820,5 +820,15 @@ $MUGQIC_INSTALL_HOME/C3G_workshop/ebi_workshop
 
 [Link to CernVm-Fs](https://cernvm.cern.ch/portal/filesystem)
 
+## Take home messages:
+
+* Metrics
+
+* Each cancer sample is different there are not parameters that work for all samples
+
+* Use cancer tools
+
+* All decission, all choise have a cost. You have to know this cost when you are looking at your results
+
 ## Aknowledgments
 I would like to thank and acknowledge Louis Letrouneau and Ann-Mary Patch for their help and for sharing his material. The format of the tutorial has been inspired from Mar Gonzalez Porta. I also want to acknowledge Joel Fillon, Louis Letrouneau (again), Robert Everleigh, Francois Lefebvre, Maxime Caron and Guillaume Bourque for the help in building our pipelines and working with all the various datasets.
