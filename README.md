@@ -616,7 +616,12 @@ sv=read.table("delly.somatic.vcf")
 cnv=read.table("scones.somatic.tsv",header=T)
 
 ```
+*He filtered to have only somatic variants.*
 
+*They have different format 2 in vcf format and 1 in tsv format and they contain mutations, insertions, deletions, large amplifications... the only call we are missing is small INDELS. Usually the number is very high with a lot of FP and makes the plot noisy, we could have include them.*
+
+*Why we are not using vcf format with scones? Some people say it is better to have it in 'vcf' file but some others prefer 'tsv'*
+*For SNV is quite good (one position) it is perfect, but then for the rest of calls, such as SV or CNV, you have two break points and the some people prefer to use 'tsv' files or some sort of BED tsv format. Of course them some tools do not swallow this files. So make your choice!.*
 
 We need to set-up the generic graphical parameters 
 
@@ -631,12 +636,17 @@ circos.par("canvas.xlim" = c(-1.3, 1.3), "canvas.ylim" = c(-1.3, 1.3))
 
 Let's draw hg19 reference ideograms
 
+*It has already some libraries so we only need to load them on your graph, for instance ideograms like in the example.*
+
 ```{.R}
 circos.initializeWithIdeogram(species = "hg19")
 
 ```
 
 Unfortunately circlize does not support b37 as it it based on UCSC. So we will need to reformat our data to fit the hg19 standards.
+
+*Contigs differ!!!*
+
 As we work only with autosomes we won't need to lift-over and we could simply add **chr** at the begin of the chromosome names
 
 
@@ -657,8 +667,9 @@ Let's draw the 2 tracks for cnvs. One track for duplication in red and one blue 
 ```{.R}
 dup=cnv[cnv[,5]>2,]
 dup[,1]=paste("chr",as.character(dup[,1]),sep="")
-del=cnv[cnv[,5]<2,]
+del=cnv[cnv[,5]<2,] #less than two copies
 del[,1]=paste("chr",as.character(del[,1]),sep="")
+# plot rectangles instead o points (snv above)
 circos.genomicTrackPlotRegion(dup, stack = TRUE,panel.fun = function(region, value, ...) {
         circos.genomicRect(region, value, col = "red",bg.border = NA, cex=1 , ...)
 })
@@ -676,8 +687,8 @@ To  finsh we just need to draw 3 tracks + positional links to represent SVs
 
 Unfortunately the vcf format has not been designed for SVs. SVs are defined by 2 breakpoints and the vcf format store the second one in the info field. So we will need to extract this information to draw these calls.
 
-
 ```{.R}
+# Extract the data from the vcf file
 chrEnd=NULL
 posEnd=NULL
 for (i in 1:dim(sv)[1]) {
@@ -687,8 +698,24 @@ for (i in 1:dim(sv)[1]) {
     posInf=strsplit(addInfo[[1]][4],split="=")
     posEnd=c(posEnd,posInf[[1]][2])
 }
+# Create a table
 svTable=data.frame(paste("chr",sv[,1],sep=""),as.numeric(sv[,2]),as.numeric(posEnd),paste("chr",chrEnd,sep=""),as.character(sv[,5]))
 
+> head (svTable)
+  paste..chr...sv...1...sep...... as.numeric.sv...2.. as.numeric.posEnd.
+1                            chr1             1595094            1660821
+2                           chr10            16317587           16327296
+3                           chr10            32306239           43842758
+4                           chr10            32311310           43611599
+5                           chr10            47589815           47590241
+6                           chr12             5082210            5083108
+  paste..chr...chrEnd..sep...... as.character.sv...5..
+1                           chr1                 <DUP>
+2                          chr10                 <DEL>
+3                          chr10                 <DUP>
+4                          chr10                 <INV>
+5                          chr10                 <DEL>
+6                          chr12                 <DEL>
 ```
 Now that we have reformated the SV calls, let's draw them
 
@@ -725,6 +752,13 @@ legend(0.6,0.95,legend="SV-TRANSLOCATION",col="black",lty=1,cex=0.75,lwd=1.2,bty
 you should obtain a plot like this one
 ![circular_view](img/somatic_circular_plot.pdf)
 
+*My result*
+
+![circosR_plot](img/circosPlot_good.png)
+
+*In chromosome 3 we have a big deletion--> kidney cancer*
+
+
 Exercice:
 
 
@@ -754,7 +788,37 @@ Many other visualizations of cancer data are possible. we will not go further in
 2. Genomic context of somatic mutations  ![lego plot](img/somatic_lego_plot.png)
 3. Representation of a possible transcriptional bias for somatic mutation ![transcriptional bias](img/somatic_transciptional_bias.png) 
 
+**Notes about software:**
 
+```bash
+
+# when you launch the container this path is pointing to
+$ realpath $MUGQIC_INSTALL_HOME
+/cvmfs/soft.mugqic/CentOS6
+
+# Available software
+ls $MUGQIC_INSTALL_HOME/software
+
+# or even better
+$ module avail
+------------------------------------------------------------------------------ /cvmfs/soft.mugqic/CentOS6/modulefiles ------------------------------------------------------------------------------
+mugqic/ABySS/1.3.5                            mugqic/fastqc/0.11.5                      mugqic/mugqic_pipelines/2.3.0(default)    mugqic/samtools/1.3                           
+mugqic/ABySS/2.0.2(default)                   mugqic/fastqc/0.11.6.devel(default)       mugqic/mugqic_R_packages/1.0.1            mugqic/samtools/1.3.1     
+...
+
+## They also automatically point to the reference genome and all kind of files that you normally need to run your genomic analyses, for instance:
+ls $MUGQIC_INSTALL_HOME/genomes/species/Homo_sapiens.GRCh38/annotations/
+
+```
+## Data
+
+Data can be access from the container in the following path.
+
+```
+$MUGQIC_INSTALL_HOME/C3G_workshop/ebi_workshop 
+```
+
+[Link to CernVm-Fs](https://cernvm.cern.ch/portal/filesystem)
 
 ## Aknowledgments
 I would like to thank and acknowledge Louis Letrouneau and Ann-Mary Patch for their help and for sharing his material. The format of the tutorial has been inspired from Mar Gonzalez Porta. I also want to acknowledge Joel Fillon, Louis Letrouneau (again), Robert Everleigh, Francois Lefebvre, Maxime Caron and Guillaume Bourque for the help in building our pipelines and working with all the various datasets.
