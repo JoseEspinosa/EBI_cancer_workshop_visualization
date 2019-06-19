@@ -815,7 +815,7 @@ ls $MUGQIC_INSTALL_HOME/genomes/species/Homo_sapiens.GRCh38/annotations/
 Data can be access from the container in the following path.
 
 ```
-$MUGQIC_INSTALL_HOME/C3G_workshop/ebi_workshop 
+$MUGQIC_INSTALL_HOME/C3G_workshop/ebi_workshop
 ```
 
 [Link to CernVm-Fs](https://cernvm.cern.ch/portal/filesystem)
